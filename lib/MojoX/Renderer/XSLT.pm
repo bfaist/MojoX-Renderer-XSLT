@@ -36,39 +36,47 @@ if you don't export anything, such as for a purely object-oriented module.
 =cut
 
 sub _create_xslt {
-  my ($self, $class,$stylesheet) = @_;
+  my ($self, $class, $params) = @_;
+
   unless ($class =~ /\A[\w:]+\z/) {
     die "invalid xslt_class '$class'";
   }
+
   # class = MojoX::Renderer::XSLT:: + XML::LibXSLT
   $class = 'MojoX::Renderer::XSLT::' . $class unless $class =~ m/^MojoX::Renderer::XSLT/;
+
   eval "require $class";
   die "can't load '$class': $@" if $@;
-  return defined($stylesheet) ? $class->new($stylesheet) : $class->new();
+
+  return defined($params) ? $class->new($params) : $class->new();
 }
 
-sub build {
-  my $self = shift;
+=head3 build
 
-  my ($class, $params, $stylesheet);
+=cut
+
+sub build {
+  my $class = shift;
+
+  my ($xslt_class, $params);
   if ($_[0] && $_[0] =~ /\Axslt_/) {
     my %args = @_;
-    $class = $args{xslt_class};
+    $xslt_class = $args{xslt_class};
     $params = $args{xslt_params};
-    $stylesheet = $args{xslt_stylesheet} if exists $args{xslt_stylesheet};
   }
   else {
     $params = \@_;
   }
 
   # fallback to XML::LibXSLT as default encoder class if needed
-  $class ||= 'XML::LibXSLT';
+  $xslt_class ||= 'XML::LibXSLT';
 
-  my $xslt = $self->_create_xslt($class, $stylesheet);
+  my $xslt = $class->_create_xslt($xslt_class,$params);
 
   return sub {
-    my ($mojo, $ctx, $output) = @_;
-    $$output = $xslt->transform($ctx->stash->{result},$ctx->stash->{stylesheet});
+    my ($mojo, $ctx, $output, $options) = @_;
+    my $template = $ctx->app->home->rel_file('templates/' . $options->{template});
+    $$output = $xslt->transform($template,$ctx->stash->{xml});
     return 1;
   };
 }

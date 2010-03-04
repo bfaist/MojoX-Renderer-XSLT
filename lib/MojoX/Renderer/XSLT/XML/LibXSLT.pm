@@ -3,6 +3,7 @@ package MojoX::Renderer::XSLT::XML::LibXSLT;
 use warnings;
 use strict;
 
+use base 'Mojo::Base';
 use XML::LibXML;
 use XML::LibXSLT;
 
@@ -37,36 +38,38 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 FUNCTIONS
 
-=head2 function1
+=head2 new
 
 =cut
 
 sub new {
     my $class = shift;
-    my $stylesheet = shift;
-    my $self = {};
-    bless $self, $class;
-    $self->{_xslt_processor} = XML::LibXSLT->new();
-    $self->{_xml_parser} = XML::LibXML->new();
-    $self->{_style_doc} = $self->{_xml_parser}->parse($stylesheet) if $stylesheet;
+    my $self = $class->SUPER::new();
+    $self->_init();
     return $self;
 }
 
-sub transform {
+sub _init {
     my $self = shift;
-    my ($input, $stylesheet) = @_;
-
-    $self->{_style_doc} = $self->{_xml_parser}->parse($stylesheet) if $stylesheet;
-    my $parsed_stylesheet =  $xslt->parse_stylesheet($self->{_style_doc});
-    my $results = $parsed_stylesheet->transform($input); 
-    return $stylesheet->output_string($results);
+    $self->{_xslt_processor} = XML::LibXSLT->new();
+    $self->{_xml_parser} = XML::LibXML->new();
 }
 
-=head2 function2
+=head3 transform
 
 =cut
 
-sub function2 {
+sub transform {
+    my $self = shift;
+    my ($stylesheet,$xml) = @_;
+
+    return undef unless $stylesheet && $xml;
+
+    my $xml_doc = $self->{_xml_parser}->parse_string($xml) or die "Failure to parse XML $xml $@";
+    my $style_doc = $self->{_xml_parser}->parse_file($stylesheet) or die "Failure to parse stylesheet $stylesheet $@";
+    my $parsed_stylesheet =  $self->{_xslt_processor}->parse_stylesheet($style_doc) or die "Failure to parse style doc $@";
+    my $results = $parsed_stylesheet->transform($xml_doc) or die "Failure to do XSLT transform $@"; 
+    return $parsed_stylesheet->output_as_bytes($results);
 }
 
 =head1 AUTHOR
