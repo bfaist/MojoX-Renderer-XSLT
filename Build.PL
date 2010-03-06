@@ -9,6 +9,10 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/MojoX/Renderer/XSLT.pm',
     build_requires => {
         'Test::More' => 0,
+        'XML::LibXML' => 0,
+        'XML::LibXSLT' => 0,
+        'FindBin' => 0,
+        'Mojo' => 0,
     },
     add_to_cleanup      => [ 'MojoX-Renderer-XSLT-*' ],
     create_makefile_pl => 'traditional',

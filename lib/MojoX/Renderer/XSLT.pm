@@ -17,21 +17,31 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
+This module enables a Mojo / Mojolicious app to render output using XSLT stylesheets.
 
     use MojoX::Renderer::XSLT;
 
-    my $foo = MojoX::Renderer::XSLT->new();
-    ...
+    sub startup {
+        my $self = shift;
+    
+        $self->types->type(xsl => 'text/html');
+    
+        my $renderer = MojoX::Renderer::XSLT->build();
+    
+        $self->renderer->add_handler(xsl => $renderer);
+        $self->renderer->default_handler('xsl');
+    
+        # Routes
+        my $r = $self->routes;
 
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+        ...
+    }
 
 =head1 FUNCTIONS
+
+=head2 _create_xslt
+
+Used internally only to instantiate a wrapper class which handles the XSLT parsing and transform.
 
 =cut
 
@@ -51,30 +61,25 @@ sub _create_xslt {
   return defined($params) ? $class->new($params) : $class->new();
 }
 
-=head3 build
+=head2 build
+
+This method is used to build an anonymous closure function which can be added as a handler for rendering output.
 
 =cut
 
 sub build {
   my $class = shift;
-
-  my ($xslt_class, $params);
-  if ($_[0] && $_[0] =~ /\Axslt_/) {
-    my %args = @_;
-    $xslt_class = $args{xslt_class};
-    $params = $args{xslt_params};
-  }
-  else {
-    $params = \@_;
-  }
+  my %params = @_;
 
   # fallback to XML::LibXSLT as default encoder class if needed
-  $xslt_class ||= 'XML::LibXSLT';
+  my $xslt_class = $params{xslt_class} || 'XML::LibXSLT';
 
-  my $xslt = $class->_create_xslt($xslt_class,$params);
+  my $xslt = $class->_create_xslt($xslt_class,\%params);
 
+  # return closure which will become render handler
   return sub {
     my ($mojo, $ctx, $output, $options) = @_;
+    # TODO:  Should templates be in controller specific dirs?
     my $template = $ctx->app->home->rel_file('templates/' . $options->{template});
     $$output = $xslt->transform($template,$ctx->stash->{xml});
     return 1;

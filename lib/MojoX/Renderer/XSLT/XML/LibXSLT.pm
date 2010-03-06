@@ -40,6 +40,8 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head2 new
 
+Constructor
+
 =cut
 
 sub new {
@@ -56,6 +58,8 @@ sub _init {
 }
 
 =head3 transform
+
+Parse XML and stylesheet into XML::LibXML document objects.  Do XSLT transform.
 
 =cut
 
