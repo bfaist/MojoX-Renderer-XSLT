@@ -1,0 +1,26 @@
+---
+name: MojoX-Renderer-XSLT
+version: 0.01
+author:
+  - 'Bob Faist <bfaist@cpan.org>'
+abstract: The great new MojoX::Renderer::XSLT!
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  FindBin: 0
+  Mojo: 0
+  Test::More: 0
+  XML::LibXML: 0
+  XML::LibXSLT: 0
+provides:
+  MojoX::Renderer::XSLT:
+    file: lib/MojoX/Renderer/XSLT.pm
+    version: 0.01
+  MojoX::Renderer::XSLT::XML::LibXSLT:
+    file: lib/MojoX/Renderer/XSLT/XML/LibXSLT.pm
+    version: 0.01
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
