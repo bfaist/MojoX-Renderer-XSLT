@@ -1,4 +1,4 @@
-package xslttest;
+package basictest;
 
 use strict;
 use warnings;
@@ -22,7 +22,6 @@ sub startup {
 
     $r->route('/test1')->to('tester#test1');
     $r->route('/test2')->to('tester#test2');
-    $r->route('/test3')->to('tester#test3');
 }
 
 1;

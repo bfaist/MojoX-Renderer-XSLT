@@ -8,11 +8,11 @@ license: perl
 resources:
   license: http://dev.perl.org/licenses/
 build_requires:
-  FindBin: 0
-  Mojo: 0
-  Test::More: 0
-  XML::LibXML: 0
-  XML::LibXSLT: 0
+  FindBin: 1.49
+  Mojo: 0.999923
+  Test::More: 0.92
+  XML::LibXML: 1.69
+  XML::LibXSLT: 1.68
 provides:
   MojoX::Renderer::XSLT:
     file: lib/MojoX/Renderer/XSLT.pm

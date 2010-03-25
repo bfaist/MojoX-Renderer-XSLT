@@ -47,14 +47,30 @@ Constructor
 sub new {
     my $class = shift;
     my $self = $class->SUPER::new();
-    $self->_init();
+    $self->_init(@_);
     return $self;
 }
 
 sub _init {
     my $self = shift;
+    my $params = shift;
+
     $self->{_xslt_processor} = XML::LibXSLT->new();
     $self->{_xml_parser} = XML::LibXML->new();
+  
+    if($params) {
+        $self->{_xslt_processor}->max_depth($params->{max_depth}) if exists $params->{max_depth} && defined $params->{max_depth};
+    
+        $self->{_xslt_processor}->debug_callback($params->{debug_callback}) if exists $params->{debug_callback} && defined $params->{debug_callback};
+    
+        if(exists $params->{register_function} && ref($params->{register_function}) eq "ARRAY") {
+            foreach my $reg (@{ $params->{register_function} }) {
+                 $self->{_xslt_processor}->register_function($reg->{urn},
+                                                             $reg->{name},
+                                                             $reg->{subref});
+            }
+        }
+    }
 }
 
 =head3 transform
